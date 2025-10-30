@@ -74,5 +74,5 @@ app.get("/api/standings", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log("✅ Starting GoalMind Backend on Render...");
 });
