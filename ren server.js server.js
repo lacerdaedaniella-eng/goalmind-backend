@@ -1,4 +1,4 @@
-// ✅ GoalMind Backend (Fixed Version)
+// ✅ GoalMind Backend (Final Fixed Version)
 import express from "express";
 import axios from "axios";
 import cors from "cors";
@@ -14,32 +14,29 @@ const API_KEY = process.env.API_FOOTBALL_KEY || process.env.API_KEY;
 app.use(cors());
 app.use(express.json());
 
-// Root route check
+// ✅ Test route for Render
 app.get("/", (req, res) => {
-  res.send("✅ GoalMind backend is live and running!");
+  res.send("✅ GoalMind Backend is running");
 });
 
-// ✅ Get Teams by League
+// ✅ Teams Route
 app.get("/api/teams", async (req, res) => {
   const { league } = req.query;
-  if (!league) {
-    return res.status(400).json({ error: "League ID is required" });
-  }
+  if (!league) return res.status(400).json({ error: "League ID is required" });
 
   try {
     const response = await axios.get(`${BASE_URL}/teams`, {
       headers: { "x-apisports-key": API_KEY },
       params: { league, season: 2024 },
     });
-    console.log("✅ Teams fetched successfully");
-    res.json(response.data);
+    res.json(response.data.response || []);
   } catch (error) {
-    console.error("❌ Error fetching teams:", error.message);
+    console.error("Error fetching teams:", error.message);
     res.status(500).json({ error: "Failed to fetch teams" });
   }
 });
 
-// ✅ Get Team Stats
+// ✅ Stats Route
 app.get("/api/stats", async (req, res) => {
   const { team, league } = req.query;
   if (!team || !league)
@@ -52,42 +49,30 @@ app.get("/api/stats", async (req, res) => {
     });
     res.json(response.data);
   } catch (error) {
-    console.error("❌ Error fetching stats:", error.message);
+    console.error("Error fetching stats:", error.message);
     res.status(500).json({ error: "Failed to fetch stats" });
   }
 });
 
-// ✅ Get Fixtures
-app.get("/api/fixtures", async (req, res) => {
-  const { team, league } = req.query;
-  if (!team || !league)
-    return res.status(400).json({ error: "Team and league are required" });
-
-  try {
-    const response = await axios.get(`${BASE_URL}/fixtures`, {
-      headers: { "x-apisports-key": API_KEY },
-      params: { league, team, season: 2024, last: 5 },
-    });
-    res.json(response.data.response || []);
-  } catch (error) {
-    console.error("❌ Error fetching fixtures:", error.message);
-    res.status(500).json({ error: "Failed to fetch fixtures" });
-  }
-});
-
-// ✅ Get Teams by League
-app.get("/api/teams", async (req, res) => {
+// ✅ Standings Route
+app.get("/api/standings", async (req, res) => {
   const { league } = req.query;
   if (!league) return res.status(400).json({ error: "League ID is required" });
 
   try {
-    const response = await axios.get(`${BASE_URL}/teams`, {
+    const response = await axios.get(`${BASE_URL}/standings`, {
       headers: { "x-apisports-key": API_KEY },
       params: { league, season: 2024 },
     });
-    res.json(response.data);
+    const standings =
+      response.data.response?.[0]?.league?.standings?.[0] || [];
+    res.json(standings.slice(0, 10));
   } catch (error) {
-    console.error("❌ Error fetching teams:", error.message);
-    res.status(500).json({ error: "Failed to fetch teams" });
+    console.error("Error fetching standings:", error.message);
+    res.status(500).json({ error: "Failed to fetch standings" });
   }
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });

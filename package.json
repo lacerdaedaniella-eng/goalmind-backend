@@ -1,7 +1,6 @@
 {
   "name": "goalmind-backend",
   "version": "1.0.0",
-  "description": "GoalMind football prediction backend",
   "main": "server.js",
   "type": "module",
   "scripts": {
