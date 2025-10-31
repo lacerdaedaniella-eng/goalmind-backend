@@ -1,4 +1,4 @@
-// ⚽ GoalMind Backend (Final Full Version)
+// ⚽ GoalMind Backend (Final Fixed Version)
 import express from "express";
 import axios from "axios";
 import cors from "cors";
@@ -9,11 +9,11 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ API-Sports Configuration
+// ✅ API-Sports configuration
 const BASE_URL = process.env.API_BASE_URL || "https://v3.football.api-sports.io";
 const API_KEY = process.env.API_FOOTBALL_KEY;
 
-// ✅ FIX CORS for frontend
+// ✅ Enable full CORS and JSON parsing
 app.use(cors());
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -24,7 +24,6 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json());
-
 
 // ✅ Root route (health check)
 app.get("/", (req, res) => {
@@ -90,11 +89,15 @@ app.get("/api/fixtures", async (req, res) => {
   try {
     const response = await axios.get(`${BASE_URL}/fixtures`, {
       headers: { "x-apisports-key": API_KEY },
-      params: { league, season: 2024, next: 10 },
+      params: {
+        league,
+        season: 2024,
+        next: 10, // fetch next 10 games
+      },
     });
 
-    if (!response.data || !response.data.response) {
-      return res.status(500).json({ error: "No fixture data returned from API" });
+    if (!response.data || !response.data.response || response.data.response.length === 0) {
+      return res.status(404).json({ message: "No upcoming fixtures found" });
     }
 
     res.json(response.data);
