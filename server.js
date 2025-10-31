@@ -1,4 +1,4 @@
-// GoalMind Backend — Final Version with Fixtures Support
+// ✅ GoalMind Backend (Final Fixed Version)
 import express from "express";
 import axios from "axios";
 import cors from "cors";
@@ -15,12 +15,12 @@ const API_KEY = process.env.API_FOOTBALL_KEY;
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-// ✅ Health check route
+// ✅ Root route
 app.get("/", (req, res) => {
-  res.send("GoalMind Backend is running successfully!");
+  res.send("GoalMind Backend is running successfully ✅");
 });
 
-// ✅ Get teams by league
+// ✅ Get Teams by League
 app.get("/api/teams", async (req, res) => {
   const { league } = req.query;
   if (!league) return res.status(400).json({ error: "League ID is required" });
@@ -30,34 +30,28 @@ app.get("/api/teams", async (req, res) => {
       headers: { "x-apisports-key": API_KEY },
       params: { league, season: 2024 },
     });
-
-    if (!response.data.response) {
-      return res.status(500).json({ error: "No data returned from API" });
-    }
-
     res.json(response.data);
   } catch (error) {
-    console.error("Error fetching teams:", error.message);
+    console.error("❌ Error fetching teams:", error.message);
     res.status(500).json({ error: "Failed to fetch teams", details: error.message });
   }
 });
 
-// ✅ Get live matches
+// ✅ Get Live Matches
 app.get("/api/live", async (req, res) => {
   try {
     const response = await axios.get(`${BASE_URL}/fixtures`, {
       headers: { "x-apisports-key": API_KEY },
       params: { live: "all" },
     });
-
     res.json(response.data);
   } catch (error) {
-    console.error("Error fetching live matches:", error.message);
+    console.error("❌ Error fetching live matches:", error.message);
     res.status(500).json({ error: "Failed to fetch live matches", details: error.message });
   }
 });
 
-// ✅ Get upcoming fixtures by league
+// ✅ Get Upcoming Fixtures by League
 app.get("/api/fixtures", async (req, res) => {
   const { league } = req.query;
   if (!league) return res.status(400).json({ error: "League ID is required" });
@@ -78,9 +72,41 @@ app.get("/api/fixtures", async (req, res) => {
 
     res.json(response.data);
   } catch (error) {
-    console.error("Error fetching fixtures:", error.message);
+    console.error("❌ Error fetching fixtures:", error.message);
     res.status(500).json({ error: "Failed to fetch fixtures", details: error.message });
   }
 });
 
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+// ✅ Get Team Statistics (for predictions)
+app.get("/api/team-stats", async (req, res) => {
+  const { league, team } = req.query;
+  if (!league || !team) {
+    return res.status(400).json({ error: "League and Team ID required" });
+  }
+
+  try {
+    const response = await axios.get(`${BASE_URL}/teams/statistics`, {
+      headers: { "x-apisports-key": API_KEY },
+      params: {
+        league,
+        team,
+        season: 2024,
+      },
+    });
+
+    if (!response.data.response) {
+      return res.status(404).json({ error: "No stats found for this team" });
+    }
+
+    res.json(response.data);
+  } catch (error) {
+    console.error("❌ Error fetching team stats:", error.response?.data || error.message);
+    res.status(500).json({
+      error: "Failed to fetch team stats",
+      details: error.response?.data || error.message,
+    });
+  }
+});
+
+// ✅ Start Server
+app.listen(PORT, () => console.log(`✅ GoalMind Backend running on port ${PORT}`));
