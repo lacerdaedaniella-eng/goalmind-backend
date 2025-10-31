@@ -86,7 +86,6 @@ app.get("/api/fixtures", async (req, res) => {
   const { league } = req.query;
   if (!league) return res.status(400).json({ error: "League ID is required" });
 
-  // Set a date range (today → +14 days)
   const today = new Date().toISOString().split("T")[0];
   const futureDate = new Date();
   futureDate.setDate(futureDate.getDate() + 14);
@@ -116,6 +115,7 @@ app.get("/api/fixtures", async (req, res) => {
     });
   }
 });
+
 
 
 // ✅ 4. Get Live Matches
