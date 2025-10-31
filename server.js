@@ -13,9 +13,18 @@ const PORT = process.env.PORT || 5000;
 const BASE_URL = process.env.API_BASE_URL || "https://v3.football.api-sports.io";
 const API_KEY = process.env.API_FOOTBALL_KEY;
 
-// ✅ Enable CORS and JSON parsing
-app.use(cors({ origin: "*" }));
+// ✅ FIX CORS for frontend
+app.use(cors());
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 app.use(express.json());
+
 
 // ✅ Root route (health check)
 app.get("/", (req, res) => {
