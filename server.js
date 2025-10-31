@@ -88,7 +88,7 @@ app.get("/api/fixtures", async (req, res) => {
 
   const today = new Date().toISOString().split("T")[0];
   const futureDate = new Date();
-  futureDate.setDate(futureDate.getDate() + 14);
+  futureDate.setDate(futureDate.getDate() + 30);
   const toDate = futureDate.toISOString().split("T")[0];
 
   try {
