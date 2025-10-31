@@ -81,10 +81,16 @@ app.get("/api/stats", async (req, res) => {
   }
 });
 
-// ✅ 3. Get Upcoming Fixtures by League
+// ✅ Get Upcoming Fixtures by League (with date range)
 app.get("/api/fixtures", async (req, res) => {
   const { league } = req.query;
   if (!league) return res.status(400).json({ error: "League ID is required" });
+
+  // Set a date range (today → +14 days)
+  const today = new Date().toISOString().split("T")[0];
+  const futureDate = new Date();
+  futureDate.setDate(futureDate.getDate() + 14);
+  const toDate = futureDate.toISOString().split("T")[0];
 
   try {
     const response = await axios.get(`${BASE_URL}/fixtures`, {
@@ -92,12 +98,13 @@ app.get("/api/fixtures", async (req, res) => {
       params: {
         league,
         season: 2024,
-        next: 10, // fetch next 10 games
+        from: today,
+        to: toDate,
       },
     });
 
     if (!response.data || !response.data.response || response.data.response.length === 0) {
-      return res.status(404).json({ message: "No upcoming fixtures found" });
+      return res.status(404).json({ message: "No upcoming fixtures found in next 2 weeks" });
     }
 
     res.json(response.data);
@@ -109,6 +116,7 @@ app.get("/api/fixtures", async (req, res) => {
     });
   }
 });
+
 
 // ✅ 4. Get Live Matches
 app.get("/api/live", async (req, res) => {
